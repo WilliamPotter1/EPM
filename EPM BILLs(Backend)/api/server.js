@@ -3,9 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const connectDB = require('./config/database');
-const authRoutes = require('./routes/auth');
-const errorHandler = require('./middleware/errorHandler');
+const connectDB = require('../src/config/database');
+const authRoutes = require('../src/api/routes/auth');
+const errorHandler = require('../src/middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
