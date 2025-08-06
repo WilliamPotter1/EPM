@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend API with MongoDB",
-  "main": "src/server.js",
+  "main": "api/server.js",
   "scripts": {
     "test": "jest"
   },
