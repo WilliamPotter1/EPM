@@ -1,124 +1,145 @@
-# Backend API with MongoDB
+# Backend API for Vercel Deployment
 
-A Node.js/Express backend API with MongoDB integration, featuring simple user registration with username and password.
+This is a Node.js/Express backend API optimized for deployment on Vercel's serverless platform.
 
 ## Features
 
-- **MongoDB Integration**: Mongoose ODM for database operations
-- **User Registration**: Simple registration with username and password
-- **Input Validation**: Joi schema validation for request data
-- **Security**: Helmet, CORS, rate limiting, and error handling
-- **Environment Configuration**: Environment variables for configuration
+- Express.js server with security middleware
+- MongoDB integration with Mongoose
+- JWT authentication
+- Rate limiting
+- CORS support
+- Input validation with Joi
+- Error handling middleware
 
-## Prerequisites
+## Local Development
 
-- Node.js (v14 or higher)
-- MongoDB (local or cloud instance)
-- npm or yarn
-
-## Installation
-
-1. Clone the repository and navigate to the backend directory:
-```bash
-cd backend
-```
-
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Create environment file:
-```bash
-cp env.example .env
-```
-
-4. Configure environment variables in `.env`:
+2. Create a `.env` file in the root directory with your environment variables:
 ```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
 NODE_ENV=development
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/your_database
 ```
 
-## Running the Application
-
-### Development Mode
+3. Run the development server:
 ```bash
 npm run dev
 ```
 
-### Production Mode
+The server will start on `http://localhost:3000`
+
+## Vercel Deployment
+
+### Prerequisites
+
+1. Install Vercel CLI:
 ```bash
-npm start
+npm i -g vercel
 ```
 
-## API Endpoints
-
-### User Registration
-- `POST /api/auth/register` - Register a new user
-
-### Health Check
-- `GET /health` - Server health status
-
-## API Usage Examples
-
-### Register User
+2. Make sure you have a Vercel account and are logged in:
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "john_doe",
-    "password": "password123"
-  }'
+vercel login
 ```
 
-**Response:**
-```json
-{
-  "message": "User created successfully",
-  "user": {
-    "id": "user_id_here",
-    "username": "john_doe"
-  }
-}
+### Deployment Steps
+
+1. Deploy to Vercel:
+```bash
+vercel
+```
+
+2. Set environment variables in Vercel dashboard:
+   - Go to your project settings
+   - Navigate to Environment Variables
+   - Add the following variables:
+     - `MONGODB_URI`: Your MongoDB connection string
+     - `JWT_SECRET`: Your JWT secret key
+     - `NODE_ENV`: `production`
+
+3. Redeploy with environment variables:
+```bash
+vercel --prod
+```
+
+### API Endpoints
+
+- `GET /api` - Root endpoint with API info
+- `GET /api/health` - Health check endpoint
+- `POST /api/auth/register` - User registration
+
+### Architecture Changes for Vercel
+
+The backend has been modified to work as a serverless function:
+
+1. **Entry Point**: `api/index.js` serves as the main serverless function
+2. **Database Connection**: Optimized for serverless with connection pooling
+3. **Routing**: All routes are prefixed with `/api`
+4. **Configuration**: `vercel.json` handles routing and build configuration
+
+### Environment Variables
+
+Make sure to set these in your Vercel project settings:
+
+- `MONGODB_URI`: MongoDB connection string
+- `JWT_SECRET`: Secret key for JWT tokens
+- `NODE_ENV`: Set to `production` for Vercel
+
+### Testing the Deployment
+
+After deployment, test your endpoints:
+
+```bash
+# Health check
+curl https://your-vercel-app.vercel.app/api/health
+
+# Root endpoint
+curl https://your-vercel-app.vercel.app/api
 ```
 
 ## Project Structure
 
 ```
-src/
-├── config/
-│   └── database.js          # MongoDB connection
-├── controllers/
-│   └── authController.js    # Registration logic
-├── middleware/
-│   ├── validation.js       # Input validation
-│   └── errorHandler.js     # Error handling
-├── models/
-│   └── User.js             # User model
-├── routes/
-│   └── auth.js             # Registration routes
-└── server.js               # Main server file
+backend/
+├── api/
+│   └── index.js          # Serverless function entry point
+├── src/
+│   ├── config/
+│   │   └── database.js   # Database connection
+│   ├── controllers/
+│   │   └── authController.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   ├── errorHandler.js
+│   │   └── validation.js
+│   ├── models/
+│   │   └── User.js
+│   └── routes/
+│       └── auth.js
+├── package.json
+├── vercel.json           # Vercel configuration
+└── README.md
 ```
 
-## Security Features
+## Troubleshooting
 
-- **Input Validation**: Request data validation with Joi
-- **Rate Limiting**: API rate limiting to prevent abuse
-- **CORS**: Cross-origin resource sharing configuration
-- **Helmet**: Security headers
+### Common Issues
 
-## Testing
+1. **Database Connection**: Ensure your MongoDB URI is correct and accessible
+2. **Environment Variables**: Double-check all environment variables are set in Vercel
+3. **CORS Issues**: The API includes CORS middleware, but you may need to configure it for your frontend domain
 
-Run tests with:
-```bash
-npm test
-```
+### Local vs Production
 
-## Environment Variables
+- Local development uses `api/server.js` (traditional Express server)
+- Production deployment uses `api/index.js` (serverless function)
+- Database connection is optimized for serverless environments
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| NODE_ENV | Environment mode | development |
-| PORT | Server port | 3000 |
-| MONGODB_URI | MongoDB connection string | mongodb://localhost:27017/your_database | 
+## License
+
+MIT 
