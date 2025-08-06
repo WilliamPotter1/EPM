@@ -37,7 +37,7 @@ function SignUp() {
     e.preventDefault()
     
     try {
-      const response = await fetch('http://38.225.209.32:3000/api/auth/register', {
+      const response = await fetch('https://epm-dun.vercel.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
