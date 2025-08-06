@@ -21,6 +21,32 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Debug endpoint to show available routes
+app.get('/api/routes', (req, res) => {
+  res.json({
+    availableRoutes: [
+      'GET /api/health',
+      'GET /api',
+      'GET /api/test',
+      'GET /api/routes',
+      'POST /api/debug-post',
+      'POST /api/auth/register',
+      'POST /api/auth/login'
+    ],
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Simple POST test endpoint (no validation, no database)
+app.post('/api/debug-post', (req, res) => {
+  console.log('Debug POST received:', req.body);
+  res.json({
+    message: 'Debug POST endpoint working',
+    receivedData: req.body,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint (no database dependency)
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -89,8 +115,8 @@ const initializeApp = async () => {
 
 // Middleware to initialize app on first request
 app.use(async (req, res, next) => {
-  // Skip initialization for health and root endpoints
-  if (req.path === '/api/health' || req.path === '/api') {
+  // Skip initialization for health, root, test, routes, and debug endpoints
+  if (req.path === '/api/health' || req.path === '/api' || req.path === '/api/test' || req.path === '/api/routes' || req.path === '/api/debug-post') {
     return next();
   }
   
@@ -108,7 +134,20 @@ app.use(async (req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ 
+    message: 'Route not found',
+    requestedPath: req.path,
+    method: req.method,
+    availableRoutes: [
+      'GET /api/health',
+      'GET /api',
+      'GET /api/test',
+      'GET /api/routes',
+      'POST /api/debug-post',
+      'POST /api/auth/register',
+      'POST /api/auth/login'
+    ]
+  });
 });
 
 // Export the Express app for Vercel serverless function
